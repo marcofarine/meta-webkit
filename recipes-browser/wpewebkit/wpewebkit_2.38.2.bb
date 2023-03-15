@@ -9,7 +9,10 @@ SRC_URI = "https://wpewebkit.org/releases/${BPN}-${PV}.tar.xz;name=tarball \
 
 SRC_URI[tarball.sha256sum] = "5ce5ac6d5cb6c13469f52d2ece34b302524ff59caf05ecf0f7c62e12c48df422"
 
-DEPENDS += " libwpe"
+DEPENDS += " \
+    libwpe \
+    systemd \
+"
 RCONFLICTS:${PN} = "libwpe (< 1.12)"
 
 SRC_URI:class-devupstream = "\
