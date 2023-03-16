@@ -1,0 +1,49 @@
+From d7198ba271449f4382c11d065c9f649f56c2c57f Mon Sep 17 00:00:00 2001
+From: Marco Farine <marco.farine@eversys.com>
+Date: Thu, 16 Mar 2023 09:50:10 -0400
+Subject: [PATCH] fixed wayland mouse bug
+
+---
+ platform/wayland/cog-platform-wl.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/platform/wayland/cog-platform-wl.c b/platform/wayland/cog-platform-wl.c
+index dbbeae9..9e13d18 100644
+--- a/platform/wayland/cog-platform-wl.c
++++ b/platform/wayland/cog-platform-wl.c
+@@ -173,7 +173,6 @@ static struct {
+ #endif
+ 
+ #ifdef COG_USE_WAYLAND_CURSOR
+-    struct wl_shm          *wl_shm;
+     struct wl_cursor_theme *cursor_theme;
+     struct wl_cursor       *cursor_left_ptr;
+     struct wl_surface      *cursor_left_ptr_surface;
+@@ -1979,14 +1978,11 @@ init_wayland (GError **error)
+     wl_display_roundtrip (wl_data.display);
+ 
+ #if COG_USE_WAYLAND_CURSOR
+-    if (wl_data.wl_shm) {
+-        if (!(wl_data.cursor_theme = wl_cursor_theme_load (NULL,
+-                                                           32,
+-                                                           wl_data.wl_shm))) {
+-            g_warning ("%s: Could not load cursor theme.", G_STRFUNC);
+-        } else if (!(wl_data.cursor_left_ptr =
+-                     wl_cursor_theme_get_cursor (wl_data.cursor_theme, "left_ptr"))) {
+-            g_warning ("%s: Could not load left_ptr cursor.", G_STRFUNC);
++    if (wl_data.shm) {
++        if (!(wl_data.cursor_theme = wl_cursor_theme_load(NULL, 32, wl_data.shm))) {
++            g_warning("%s: Could not load cursor theme.", G_STRFUNC);
++        } else if (!(wl_data.cursor_left_ptr = wl_cursor_theme_get_cursor(wl_data.cursor_theme, "left_ptr"))) {
++            g_warning("%s: Could not load left_ptr cursor.", G_STRFUNC);
+         }
+     }
+ #endif /* COG_USE_WAYLAND_CURSOR */
+@@ -2027,7 +2023,6 @@ clear_wayland (void)
+ #ifdef COG_USE_WAYLAND_CURSOR
+     g_clear_pointer (&wl_data.cursor_left_ptr_surface, wl_surface_destroy);
+     g_clear_pointer (&wl_data.cursor_theme, wl_cursor_theme_destroy);
+-    g_clear_pointer (&wl_data.wl_shm, wl_shm_destroy);
+ #endif /* COG_USE_WAYLAND_CURSOR */
+ 
+     wl_registry_destroy (wl_data.registry);
